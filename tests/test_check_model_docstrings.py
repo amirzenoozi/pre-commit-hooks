@@ -125,6 +125,7 @@ def test_non_model_classes_are_ignored(tmp_path, capsys):
 
 def test_excluded_paths_are_skipped(tmp_path, capsys):
     model = "from pydantic import BaseModel\nclass T(BaseModel):\n    a: int\n"
+    _write(tmp_path, "plain.py", "class Plain:\n    a: int\n")
     _write(tmp_path, "tests/test_models.py", model)
     assert _run(tmp_path, capsys) == (0, [])
 
@@ -163,3 +164,19 @@ class Loop(other.Loop, BaseModel):
 ''',
     )
     assert _run(tmp_path, capsys) == (0, [])
+
+
+def test_missing_path_fails(tmp_path, capsys):
+    with pytest.raises(SystemExit) as exit_info:
+        main([str(tmp_path / "renamed")])
+    assert exit_info.value.code == 2
+    assert "path does not exist" in capsys.readouterr().err
+
+
+def test_path_without_python_files_fails(tmp_path, capsys):
+    (tmp_path / "empty").mkdir()
+    (tmp_path / "empty" / "README.md").write_text("no code here")
+    with pytest.raises(SystemExit) as exit_info:
+        main([str(tmp_path / "empty")])
+    assert exit_info.value.code == 2
+    assert "no Python files found" in capsys.readouterr().err

@@ -46,6 +46,10 @@ app/models.py:12: no docstring
 app/models.py:30: missing :param: for ['email']
 ```
 
+A path in `args` that does not exist, or contains no Python files after
+`--exclude`, fails the hook with exit code `2`. This catches a stale `args`
+entry, e.g. after a package directory is renamed.
+
 ## Usage
 
 Add to your `.pre-commit-config.yaml`:
@@ -53,7 +57,7 @@ Add to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/amirzenoozi/pre-commit-hooks
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: check-model-docstrings
         # Directories (or files) to scan; defaults to the whole repository.
@@ -81,7 +85,7 @@ relevant files change:
 ### Command line
 
 ```bash
-pip install git+https://github.com/amirzenoozi/pre-commit-hooks@v0.1.0
+pip install git+https://github.com/amirzenoozi/pre-commit-hooks@v0.1.1
 check-model-docstrings src/ --exclude 'migrations/'
 ```
 

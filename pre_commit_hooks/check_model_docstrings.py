@@ -183,8 +183,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    exclude = re.compile(args.exclude)
+    # A stale path (e.g. a renamed package) must fail, not silently check nothing.
+    for raw in args.paths:
+        if not Path(raw).exists():
+            parser.error(f"path does not exist: {raw}")
+        if not _python_files([raw], exclude):
+            parser.error(f"no Python files found in: {raw}")
+
     violations: list[str] = []
-    files = _python_files(args.paths, re.compile(args.exclude))
+    files = _python_files(args.paths, exclude)
     classes = _collect_classes(files, violations)
     models = _find_models(classes, args.model_bases or _DEFAULT_MODEL_BASES)
     for model in models:
