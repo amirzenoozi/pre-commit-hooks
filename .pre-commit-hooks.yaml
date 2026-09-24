@@ -1,0 +1,8 @@
+- id: check-model-docstrings
+  name: check model docstrings
+  description: Every Pydantic/SQLModel model documents its own fields with a `:param` line.
+  entry: check-model-docstrings
+  language: python
+  types: [python]
+  # Models inherit across files, so every run scans the paths given in `args`.
+  pass_filenames: false
